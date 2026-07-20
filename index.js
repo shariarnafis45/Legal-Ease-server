@@ -3,7 +3,7 @@ const app = express();
 const cors = require("cors");
 require("dotenv").config();
 const port = process.env.PORT;
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = process.env.MONGO_URI;
 
 // middleware
@@ -41,6 +41,30 @@ async function run() {
         completeProfile: true,
       };
       const result = await usersCollection.find(query).toArray();
+      res.send(result);
+    });
+    // signle lawyer get Api
+    app.get("/api/lawyers/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = {
+        _id: new ObjectId(id),
+      };
+      const result = await usersCollection.findOne(query);
+      res.send(result);
+    });
+
+    // update user type
+    app.patch("/api/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const { userType } = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const updateData = {
+        $set: {
+          userType: userType,
+        },
+      };
+
+      const result = await usersCollection.updateOne(filter, updateData);
       res.send(result);
     });
 
