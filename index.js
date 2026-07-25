@@ -27,6 +27,7 @@ async function run() {
     const database = client.db("legalEaseDB");
     const usersCollection = database.collection("user");
     const paymentCollection = database.collection("payment");
+    const hireRequestsCollection = database.collection("hiringRequest");
 
     //all user get api
     app.get("/api/users", async (req, res) => {
@@ -157,6 +158,42 @@ async function run() {
       const result = await usersCollection.updateOne(filter, updateData);
       res.send(result);
     });
+
+    // hiring request api
+    app.post("/api/hire-request", async (req, res) => {
+      const requestData = req.body;
+
+      if (!requestData.lawyerId || !requestData.userEmail) {
+        return res.status(400).send({
+          success: false,
+          message: "Required fields (lawyerId, userEmail) are missing!",
+        });
+      }
+
+      const newHireRequest = {
+        lawyerId: requestData.lawyerId,
+        lawyerName: requestData.lawyerName,
+        lawyerEmail: requestData.lawyerEmail,
+        clientId: requestData.clientId,
+        clientName: requestData.clientName,
+        clientEmail: requestData.clientEmail,
+        fee: Number(requestData.fee),
+        specialization: requestData.specialization,
+
+        status: "pending",
+        paymentStatus: "unpaid",
+        createdAt: new Date(),
+      };
+
+      const result = await hireRequestsCollection.insertOne(newHireRequest);
+
+      res.send(newHireRequest);
+    });
+
+    // request already exist 
+    app.get('/api/hiring', async(req,res)=>{
+      
+    })
 
     // payment related api
     app.post("/api/payment", async (req, res) => {
