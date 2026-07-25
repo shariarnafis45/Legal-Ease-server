@@ -158,15 +158,14 @@ async function run() {
       const result = await usersCollection.updateOne(filter, updateData);
       res.send(result);
     });
-
     // hiring request api
     app.post("/api/hire-request", async (req, res) => {
       const requestData = req.body;
 
-      if (!requestData.lawyerId || !requestData.userEmail) {
+      if (!requestData.lawyerId || !requestData.clientEmail) {
         return res.status(400).send({
           success: false,
-          message: "Required fields (lawyerId, userEmail) are missing!",
+          message: "Required fields (lawyerId, clientEmail) are missing!",
         });
       }
 
@@ -185,15 +184,22 @@ async function run() {
         createdAt: new Date(),
       };
 
+      console.log(newHireRequest);
       const result = await hireRequestsCollection.insertOne(newHireRequest);
 
-      res.send(newHireRequest);
+      res.send(result);
     });
 
-    // request already exist 
-    app.get('/api/hiring', async(req,res)=>{
-      
-    })
+    // request already exist
+    app.get("/api/hiring", async (req, res) => {
+      const query = {
+        clientId: req.query.clientId,
+        lawyerId: req.query.lawyerId,
+      };
+
+      const result = await hireRequestsCollection.findOne(query);
+      res.json(result);
+    });
 
     // payment related api
     app.post("/api/payment", async (req, res) => {
