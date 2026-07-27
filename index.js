@@ -36,6 +36,20 @@ async function run() {
       res.send(result);
     });
 
+    // update user info api
+    app.patch("/api/update-users/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedData = req.body;
+      const query = {
+        _id: new ObjectId(id),
+      };
+      const updateData = {
+        $set: updatedData,
+      };
+      const result = await usersCollection.updateOne(query, updateData);
+      res.send(result);
+    });
+
     // lawyers Api
     app.get("/api/lawyers", async (req, res) => {
       const query = {
@@ -200,6 +214,15 @@ async function run() {
       const result = await hireRequestsCollection.findOne(query);
       res.json(result);
     });
+    // get hiring request history
+    app.get("/api/client/hiring-request", async (req, res) => {
+      const query = {
+        clientId: req.query.clientId,
+      };
+
+      const result = await hireRequestsCollection.find(query).toArray();
+      res.json(result);
+    });
 
     // payment related api
     app.post("/api/payment", async (req, res) => {
@@ -214,6 +237,18 @@ async function run() {
         lawyerName,
         amount,
         clientId,
+      });
+
+      // update payment status in request collection
+      const query = {
+        clientId: clientId,
+        lawyerId: lawyerId,
+      };
+
+      const update = await hireRequestsCollection.updateOne(query, {
+        $set: {
+          paymentStatus: "paid",
+        },
       });
       res.send(result);
     });
