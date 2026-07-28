@@ -198,7 +198,6 @@ async function run() {
         createdAt: new Date(),
       };
 
-      console.log(newHireRequest);
       const result = await hireRequestsCollection.insertOne(newHireRequest);
 
       res.send(result);
@@ -214,10 +213,36 @@ async function run() {
       const result = await hireRequestsCollection.findOne(query);
       res.json(result);
     });
+
+    // update hiring request status
+    app.patch("/api/update-hiring-status", async (req, res) => {
+      const { status } = req.body;
+      const query = {
+        clientId: req.query.clientId,
+        lawyerId: req.query.lawyerId,
+      };
+    
+      const result = await hireRequestsCollection.updateOne(query, {
+        $set: {
+          status: status,
+        },
+      });
+      console.log(result);
+      res.send(result);
+    });
     // get hiring request history
     app.get("/api/client/hiring-request", async (req, res) => {
       const query = {
         clientId: req.query.clientId,
+      };
+
+      const result = await hireRequestsCollection.find(query).toArray();
+      res.json(result);
+    });
+    // get hiring request history
+    app.get("/api/lawyer/hiring-request", async (req, res) => {
+      const query = {
+        lawyerId: req.query.lawyerId,
       };
 
       const result = await hireRequestsCollection.find(query).toArray();
