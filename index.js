@@ -23,7 +23,7 @@ const client = new MongoClient(uri, {
 });
 async function run() {
   try {
-    await client.connect();
+    // await client.connect();
     const database = client.db("legalEaseDB");
     const usersCollection = database.collection("user");
     const paymentCollection = database.collection("payment");
@@ -278,7 +278,7 @@ async function run() {
       res.send(result);
     });
 
-    const result = await client.db("admin").command({ ping: 1 });
+    // const result = await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!",
     );
