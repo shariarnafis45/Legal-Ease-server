@@ -42,64 +42,76 @@ async function run() {
     // node mailer
     app.post("/api/send-email", async (req, res) => {
       const { name, email } = req.query;
+      const currentYear = new Date().getFullYear();
       const info = await transporter.sendMail({
         from: process.env.NODE_MAILER_EMAIL,
         to: email,
         subject: "Welcome to LegalEase",
+        text: `Hi ${name},
+
+Thank you for creating your LegalEase account. We're happy to welcome you to our community.
+
+Your account has been created successfully. You can now sign in and explore LegalEase.
+
+Best regards,
+The LegalEase Team`,
         html: `
-    <div style="margin: 0; padding: 40px 16px; background-color: #f8fafc; font-family: Arial, Helvetica, sans-serif;">
-      <div style="max-width: 560px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
 
-        <div style="padding: 28px 32px; background-color: #6d5ef5; text-align: center;">
-          <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">
-            LegalEase
-          </h1>
-          <p style="margin: 8px 0 0; color: #eeecff; font-size: 14px;">
-            Legal support, made simpler.
-          </p>
-        </div>
+  <div style="margin:0;padding:32px 16px;background-color:#f8fafc;font-family:Arial,Helvetica,sans-serif;">
+    <div style="max-width:560px;margin:0 auto;background-color:#ffffff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
 
-        <div style="padding: 32px;">
-          <h2 style="margin: 0 0 16px; color: #0f172a; font-size: 23px;">
-            Welcome to LegalEase, Mr/Ms ${name}!
-          </h2>
+  <div style="padding:28px 24px;background-color:#6d5ef5;text-align:center;">
+    <h1 style="margin:0;color:#ffffff;font-size:26px;font-weight:700;">
+      LegalEase
+    </h1>
+    <p style="margin:8px 0 0;color:#eeecff;font-size:14px;line-height:1.5;">
+      Legal support, made simpler.
+    </p>
+  </div>
 
-          <p style="margin: 0 0 16px; color: #475569; font-size: 15px; line-height: 1.8;">
-            Thank you for joining LegalEase. We're glad to have you as part of our community.
-          </p>
+  <div style="padding:32px 28px;">
+    <h2 style="margin:0 0 18px;color:#0f172a;font-size:22px;line-height:1.4;">
+      Welcome to LegalEase, ${name}!
+    </h2>
 
-          <p style="margin: 0 0 16px; color: #475569; font-size: 15px; line-height: 1.8;">
-            LegalEase connects people seeking legal assistance with legal professionals through a simple, secure, and transparent online platform.
-          </p>
+    <p style="margin:0 0 16px;color:#475569;font-size:15px;line-height:1.8;">
+      Hi ${name},
+    </p>
 
-          <p style="margin: 0 0 24px; color: #475569; font-size: 15px; line-height: 1.8;">
-            Whether you're looking for legal guidance or growing your legal career, we're here to help make the process easier and more accessible.
-          </p>
+    <p style="margin:0 0 16px;color:#475569;font-size:15px;line-height:1.8;">
+      Thank you for creating your LegalEase account. We're happy to welcome you to our community.
+    </p>
 
-          <div style="padding: 16px; background-color: #f8fafc; border-left: 4px solid #6d5ef5; border-radius: 4px;">
-            <p style="margin: 0; color: #334155; font-size: 14px; line-height: 1.7;">
-              Your account is ready to get started. Explore LegalEase and discover a better way to connect with legal services.
-            </p>
-          </div>
+    <p style="margin:0 0 22px;color:#475569;font-size:15px;line-height:1.8;">
+      LegalEase helps people connect with legal professionals through an accessible online platform. You can now sign in to your account and explore the available features.
+    </p>
 
-          <p style="margin: 28px 0 0; color: #475569; font-size: 15px; line-height: 1.7;">
-            Best regards,<br />
-            <strong style="color: #0f172a;">The LegalEase Team</strong>
-          </p>
-        </div>
-
-        <div style="padding: 20px 32px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;">
-          <p style="margin: 0 0 8px; color: #64748b; font-size: 12px; line-height: 1.6;">
-            You received this email because an account was created using this email address.
-          </p>
-          <p style="margin: 0; color: #94a3b8; font-size: 12px;">
-            © ${new Date().getFullYear()} LegalEase. All rights reserved.
-          </p>
-        </div>
-
-      </div>
+    <div style="padding:16px;background-color:#f8fafc;border-left:4px solid #6d5ef5;border-radius:4px;">
+      <p style="margin:0;color:#334155;font-size:14px;line-height:1.8;">
+        <strong>Your account has been created successfully.</strong><br />
+        You can sign in whenever you're ready to get started.
+      </p>
     </div>
-  `,
+
+    <p style="margin:26px 0 0;color:#475569;font-size:15px;line-height:1.8;">
+      Best regards,<br />
+      <strong style="color:#0f172a;">The LegalEase Team</strong>
+    </p>
+  </div>
+
+  <div style="padding:20px 24px;background-color:#f8fafc;border-top:1px solid #e2e8f0;text-align:center;">
+    <p style="margin:0 0 8px;color:#64748b;font-size:12px;line-height:1.7;">
+      You received this email because an account was created using this email address.
+    </p>
+    <p style="margin:0;color:#94a3b8;font-size:12px;line-height:1.6;">
+      &copy; ${currentYear} LegalEase. All rights reserved.
+    </p>
+  </div>
+
+</div>
+
+  </div>
+`,
       });
       transporter.sendMail(info);
     });
