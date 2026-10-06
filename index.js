@@ -113,7 +113,18 @@ The LegalEase Team`,
   </div>
 `,
       });
-      transporter.sendMail(info);
+      try {
+        return res.status(200).json({
+          success: true,
+          message: "Welcome email sent successfully",
+        });
+      } catch (error) {
+        console.error("Email sending failed:", error);
+        return res.status(500).json({
+          success: false,
+          message: "Failed to send welcome email",
+        });
+      }
     });
 
     //all user get api
