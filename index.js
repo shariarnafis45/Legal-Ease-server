@@ -5,10 +5,20 @@ require("dotenv").config();
 const port = process.env.PORT;
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = process.env.MONGO_URI;
+const nodemailer = require("nodemailer");
 
 // middleware
 app.use(cors());
 app.use(express.json());
+
+// nodemailer transpoter
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.NODE_MAILER_EMAIL,
+    pass: process.env.NODE_MAILER_PASS,
+  },
+});
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
@@ -28,6 +38,71 @@ async function run() {
     const usersCollection = database.collection("user");
     const paymentCollection = database.collection("payment");
     const hireRequestsCollection = database.collection("hiringRequest");
+
+    // node mailer
+    app.post("/api/send-email", async (req, res) => {
+      const { name, email } = req.query;
+      const info = await transporter.sendMail({
+        from: process.env.NODE_MAILER_EMAIL,
+        to: email,
+        subject: "Welcome to LegalEase",
+        html: `
+    <div style="margin: 0; padding: 40px 16px; background-color: #f8fafc; font-family: Arial, Helvetica, sans-serif;">
+      <div style="max-width: 560px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
+
+        <div style="padding: 28px 32px; background-color: #6d5ef5; text-align: center;">
+          <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">
+            LegalEase
+          </h1>
+          <p style="margin: 8px 0 0; color: #eeecff; font-size: 14px;">
+            Legal support, made simpler.
+          </p>
+        </div>
+
+        <div style="padding: 32px;">
+          <h2 style="margin: 0 0 16px; color: #0f172a; font-size: 23px;">
+            Welcome to LegalEase, Mr/Ms ${name}!
+          </h2>
+
+          <p style="margin: 0 0 16px; color: #475569; font-size: 15px; line-height: 1.8;">
+            Thank you for joining LegalEase. We're glad to have you as part of our community.
+          </p>
+
+          <p style="margin: 0 0 16px; color: #475569; font-size: 15px; line-height: 1.8;">
+            LegalEase connects people seeking legal assistance with legal professionals through a simple, secure, and transparent online platform.
+          </p>
+
+          <p style="margin: 0 0 24px; color: #475569; font-size: 15px; line-height: 1.8;">
+            Whether you're looking for legal guidance or growing your legal career, we're here to help make the process easier and more accessible.
+          </p>
+
+          <div style="padding: 16px; background-color: #f8fafc; border-left: 4px solid #6d5ef5; border-radius: 4px;">
+            <p style="margin: 0; color: #334155; font-size: 14px; line-height: 1.7;">
+              Your account is ready to get started. Explore LegalEase and discover a better way to connect with legal services.
+            </p>
+          </div>
+
+          <p style="margin: 28px 0 0; color: #475569; font-size: 15px; line-height: 1.7;">
+            Best regards,<br />
+            <strong style="color: #0f172a;">The LegalEase Team</strong>
+          </p>
+        </div>
+
+        <div style="padding: 20px 32px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;">
+          <p style="margin: 0 0 8px; color: #64748b; font-size: 12px; line-height: 1.6;">
+            You received this email because an account was created using this email address.
+          </p>
+          <p style="margin: 0; color: #94a3b8; font-size: 12px;">
+            © ${new Date().getFullYear()} LegalEase. All rights reserved.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  `,
+      });
+      transporter.sendMail(info);
+    });
 
     //all user get api
     app.get("/api/users", async (req, res) => {
@@ -221,7 +296,7 @@ async function run() {
         clientId: req.query.clientId,
         lawyerId: req.query.lawyerId,
       };
-    
+
       const result = await hireRequestsCollection.updateOne(query, {
         $set: {
           status: status,
@@ -282,7 +357,7 @@ async function run() {
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!",
     );
-    return result;
+    // return result;
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
